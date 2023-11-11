@@ -216,10 +216,10 @@ app.get("/combined-data", async (req, res) => {
     const bar_chart_data = api4Response.data;
 
     const combinedData = {
-      transactions_data,
-      statistics_data,
-      pie_chart_data,
-      bar_chart_data,
+      transactionsData,
+      statisticsData,
+      pieChartData,
+      barChartData,
     };
 
     res.json(combinedData);
