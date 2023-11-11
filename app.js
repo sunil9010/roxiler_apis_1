@@ -77,7 +77,7 @@ const monthAbbreviationToNumeric = {
 
 app.get("/transactions", async (req, res) => {
   try {
-    const { page = 1, perPage = 10, search = "", month } = req.query;
+    const { page = 1, perPage = 10, search = "", month = "Mar" } = req.query;
     const offSet = (page - 1) * perPage;
     let query = `SELECT * FROM transactions`;
 
@@ -112,7 +112,7 @@ app.get("/transactions", async (req, res) => {
 
 app.get("/statistics", async (req, res) => {
   try {
-    const { month } = req.query;
+    const { month = "Mar" } = req.query;
     const numericMonth = monthAbbreviationToNumeric[month];
     if (!numericMonth) {
       res.status(400).json({ error: "Invalid month abbreviation" });
@@ -188,5 +188,42 @@ app.get("/pie-chart", async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/combined-data", async (req, res) => {
+  const { month = "Mar", search = "" } = req.query;
+  try {
+    const api1Response = await axios.get(
+      `https://roxiler-apis.onrender.com/transactions?month=${month}&search=${search}`
+    );
+    const transactions_data = api1Response.data;
+
+    const api2Response = await axios.get(
+      `https://roxiler-apis.onrender.com/statistics?month=${month}`
+    );
+    const statistics_data = api2Response.data;
+
+    const api3Response = await axios.get(
+      "https://roxiler-apis.onrender.com/pie-chart"
+    );
+    const pie_chart_data = api3Response.data;
+
+    const api4Response = await axios.get(
+      `https://roxiler-apis.onrender.com/bar-chart?month=${month}`
+    );
+    const bar_chart_data = api4Response.data;
+
+    const combinedData = {
+      transactions_data,
+      statistics_data,
+      pie_chart_data,
+      bar_chart_data,
+    };
+
+    res.json(combinedData);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
