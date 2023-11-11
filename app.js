@@ -198,22 +198,22 @@ app.get("/combined-data", async (req, res) => {
     const api1Response = await axios.get(
       `https://roxiler-apis.onrender.com/transactions?month=${month}&search=${search}`
     );
-    const transactions_data = api1Response.data;
+    const transactionsData = api1Response.data;
 
     const api2Response = await axios.get(
       `https://roxiler-apis.onrender.com/statistics?month=${month}`
     );
-    const statistics_data = api2Response.data;
+    const statisticsData = api2Response.data;
 
     const api3Response = await axios.get(
       "https://roxiler-apis.onrender.com/pie-chart"
     );
-    const pie_chart_data = api3Response.data;
+    const pieChartData = api3Response.data;
 
     const api4Response = await axios.get(
       `https://roxiler-apis.onrender.com/bar-chart?month=${month}`
     );
-    const bar_chart_data = api4Response.data;
+    const barChartData = api4Response.data;
 
     const combinedData = {
       transactionsData,
