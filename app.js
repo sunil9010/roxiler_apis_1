@@ -178,53 +178,29 @@ app.get("/bar-chart", async (req, res) => {
 
 app.get("/pie-chart", async (req, res) => {
   try {
-    let query =
-      "SELECT category, COUNT(*) as itemCount FROM transactions GROUP BY category";
-    let categoriesQuery = await db.all(query);
+    const { month } = req.query;
+    const numericMonth = monthAbbreviationToNumeric[month];
+    if (!numericMonth) {
+      res.status(400).json({ error: "Invalid month abbreviation" });
+      return;
+    }
+    let query = `
+      SELECT category, COUNT(*) as itemCount 
+      FROM transactions 
+      WHERE strftime('%m', dateOfSale) = ? 
+      GROUP BY category
+    `;
+
+    let categoriesQuery = await db.all(query, [numericMonth]);
+
     const result = {};
     categoriesQuery.forEach(({ category, itemCount }) => {
       result[category] = itemCount;
     });
+
     res.json(result);
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ error: "Internal server error" });
-  }
-});
-
-app.get("/combined-data", async (req, res) => {
-  const { month = "Mar", search = "" } = req.query;
-  try {
-    const api1Response = await axios.get(
-      `https://roxiler-apis.onrender.com/transactions?month=${month}&search=${search}`
-    );
-    const transactionsData = api1Response.data;
-
-    const api2Response = await axios.get(
-      `https://roxiler-apis.onrender.com/statistics?month=${month}`
-    );
-    const statisticsData = api2Response.data;
-
-    const api3Response = await axios.get(
-      `https://roxiler-apis.onrender.com/pie-chart?month=${month}`
-    );
-    const pieChartData = api3Response.data;
-
-    const api4Response = await axios.get(
-      `https://roxiler-apis.onrender.com/bar-chart?month=${month}`
-    );
-    const barChartData = api4Response.data;
-
-    const combinedData = {
-      transactionsData,
-      statisticsData,
-      pieChartData,
-      barChartData,
-    };
-
-    res.json(combinedData);
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ error: "Internal Server Error" });
   }
 });
