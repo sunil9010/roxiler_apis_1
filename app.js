@@ -206,7 +206,7 @@ app.get("/combined-data", async (req, res) => {
     const statisticsData = api2Response.data;
 
     const api3Response = await axios.get(
-      "https://roxiler-apis.onrender.com/pie-chart"
+      `https://roxiler-apis.onrender.com/pie-chart?month=${month}`
     );
     const pieChartData = api3Response.data;
 
